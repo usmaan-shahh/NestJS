@@ -9,6 +9,7 @@ export const Cookie = createParamDecorator(
     const request = ctx.switchToHttp().getRequest();
 
     if (data) return request.cookies?.[data];
+    
     else return request.cookies;
     
   }
