@@ -6,9 +6,9 @@ export declare class UserController {
         email: string;
         password: string;
     }): Promise<{
-        id: number;
         email: string;
         role: import("@prisma/client").$Enums.Role;
         createdAt: Date;
+        id: number;
     }>;
 }
