@@ -5,11 +5,11 @@ import { User } from './user.entity';
 @Injectable()
 export class UserRepository extends Repository<User> { //Our Custom Repository inherits all TypeORM built-in Repository Methods
 
-  constructor(private dataSource: DataSource) {
+  constructor(dataSource:DataSource) {
     super(User, dataSource.createEntityManager()); //Without createEntityManager(), the repository cannot talk to the database.     
   }
 
-  async findByEmail(email: string): Promise< User | null > {
+  async findByEmail(email: string): Promise < User | null > {
       return this.findOne({
         where: { email },
       });

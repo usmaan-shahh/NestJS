@@ -4,6 +4,7 @@ import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
+
   constructor(private readonly userRepository: UserRepository) {}
 
   async findByEmail(email: string): Promise<User | null> {
@@ -13,4 +14,5 @@ export class UserService {
   async createUser(data: Partial<User>): Promise<User> {
     return this.userRepository.createUser(data);
   }
+  
 }

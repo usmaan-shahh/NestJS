@@ -10,9 +10,9 @@ export class AuthService {
 
   constructor(private readonly userRepository: UserRepository) {}
 
-    async register(dto: RegisterDto) {
+    async register(body: RegisterDto) {
 
-    const { email, password } = dto;
+    const { email, password } = body;
 
     const existing = await this.userRepository.findByEmail(email);
 
