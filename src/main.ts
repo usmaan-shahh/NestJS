@@ -10,3 +10,6 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
+
+
+// transform: true //Converts JSON into a DTO class instance.

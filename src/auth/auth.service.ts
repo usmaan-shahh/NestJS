@@ -1,49 +1,27 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserService } from '../user/user.service';
 import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
 import { EmailAlreadyExistsError } from '../common/exceptions/user/email-already-exists.exception';
-import { User } from '../user/user.entity';
+
 
 @Injectable()
 export class AuthService {
 
   constructor(private readonly userService: UserService) {}
 
-  async register(dto: RegisterDto): Promise<Omit<User, 'password'>> {
-    const existing = await this.userService.findByEmail(dto.email);
+    async register(dto: RegisterDto) {
+
+    const { email, password } = dto;
+
+    const existing = await this.userService.findByEmail(email);
+
     if (existing) throw new EmailAlreadyExistsError();
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
-    const user = await this.userService.createUser({
-      email: dto.email,
-      password: hashedPassword,
-    });
-    const { password: _, ...result } = user;
-    return result;
-  }
 
-  async login(dto: LoginDto): Promise<{ user: Omit<User, 'password'> }> {
-    const user = await this.userService.findByEmail(dto.email);
-    if (!user) {
-      throw new UnauthorizedException('Invalid email or password');
-    }
-    const isMatch = await bcrypt.compare(dto.password, user.password);
-    if (!isMatch) {
-      throw new UnauthorizedException('Invalid email or password');
-    }
-    const { password: _, ...result } = user;
-    return { user: result };
-  }
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  logout(): { message: string } {
-    return { message: 'Logged out' };
-  }
+    await this.userService.createUser({email, password: hashedPassword});
+     
+    return {message: 'You are successfully registered'};
 
-  getMe(): { message: string } {
-    return { message: 'Use a guard to attach user to request, then return req.user' };
-  }
-}
-
-
-
+}}
