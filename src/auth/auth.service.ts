@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserService } from '../user/user.service';
-import { RegisterUserDto } from '../user/dto/register-user.dto';
+import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { EmailAlreadyExistsError } from '../common/exceptions/user/email-already-exists.exception';
 import { User } from '../user/user.entity';
@@ -10,7 +10,7 @@ import { User } from '../user/user.entity';
 export class AuthService {
   constructor(private readonly userService: UserService) {}
 
-  async register(dto: RegisterUserDto): Promise<Omit<User, 'password'>> {
+  async register(dto: RegisterDto): Promise<Omit<User, 'password'>> {
     const existing = await this.userService.findByEmail(dto.email);
     if (existing) {
       throw new EmailAlreadyExistsError();
