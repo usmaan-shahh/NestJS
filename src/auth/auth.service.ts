@@ -8,13 +8,12 @@ import { User } from '../user/user.entity';
 
 @Injectable()
 export class AuthService {
+
   constructor(private readonly userService: UserService) {}
 
   async register(dto: RegisterDto): Promise<Omit<User, 'password'>> {
     const existing = await this.userService.findByEmail(dto.email);
-    if (existing) {
-      throw new EmailAlreadyExistsError();
-    }
+    if (existing) throw new EmailAlreadyExistsError();
     const hashedPassword = await bcrypt.hash(dto.password, 10);
     const user = await this.userService.createUser({
       email: dto.email,
