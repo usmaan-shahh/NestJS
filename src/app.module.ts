@@ -4,12 +4,13 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
+import jwtConfig from './auth/jwtTokens/jwt.config';
+
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, load: [jwtConfig] }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -17,18 +18,8 @@ import { JwtModule } from '@nestjs/jwt';
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       database: process.env.DB_NAME,
-
       autoLoadEntities: true,
       synchronize: true,
-    }),
-
-    JwtModule.registerAsync({inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        secret: config.get('ACCESS_TOKEN_SECRET'),
-        signOptions: {
-          expiresIn: config.get('ACCESS_TOKEN_EXPIRES') 
-        },
-      }),
     }),
     AuthModule,
     UserModule,

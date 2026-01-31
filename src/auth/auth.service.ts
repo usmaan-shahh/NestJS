@@ -5,15 +5,14 @@ import { RegisterDto } from './dto/register.dto';
 import { EmailAlreadyExistsException } from './exceptions/EmailAlreadyExistsException'
 import { InvalidCredentialsException } from './exceptions/InvalidCredentialsException';
 import { LoginDto } from './dto/login.dto';
-import { generateTokens } from './generateTokens/generate-tokens';
+import { TokensService } from './jwtTokens/tokens.service';
 
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userRepository: UserRepository,
-    private readonly tokens: generateTokens,
-    
-  
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly tokensService: TokensService,
   ) {}
 
   async register(body: RegisterDto) {
@@ -30,34 +29,20 @@ export class AuthService {
     return { message: 'You are successfully registered' };
   }
 
-  
   async login(body: LoginDto) {
+
     const { email, password } = body;
 
     const user = await this.userRepository.findByEmail(email);
 
     if (!user) throw new InvalidCredentialsException();
-    
+
     const isPasswordMatch = await bcrypt.compare(password, user.password);
 
     if (!isPasswordMatch) throw new InvalidCredentialsException();
 
-    const tokens = await this.tokens.generateTokens({ sub: user.id });
+    const tokens = await this.tokensService.execute({ sub: user.id });
+
+    return { access_token: tokens };
   }
-
-
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
 }
