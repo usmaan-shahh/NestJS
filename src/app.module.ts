@@ -21,13 +21,12 @@ import { JwtModule } from '@nestjs/jwt';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
+
+    JwtModule.registerAsync({inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        secret: config.get<string>('ACCESS_TOKEN_SECRET'),
+        secret: config.get('ACCESS_TOKEN_SECRET'),
         signOptions: {
-          expiresIn: config.get('ACCESS_TOKEN_EXPIRES') || '15m',
+          expiresIn: config.get('ACCESS_TOKEN_EXPIRES') 
         },
       }),
     }),

@@ -1,16 +1,28 @@
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 export interface TokenPayload {
-  userId: string;
+  sub: string;
 }
 
-export const generateTokens = (jwtService: JwtService, userId: string) => {
+@Injectable()
+export class generateTokens {
+  constructor(
 
-  const payload: TokenPayload = { userId };
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
 
-  const accessToken = jwtService.sign(payload);
+  ) {}
 
-  return accessToken;
+  async generateTokens(payload: TokenPayload) {
 
- 
-};
+    const accessTokenSecret = this.configService.get('ACCESS_TOKEN_SECRET');
+    const refreshTokenExpiresIn = this.configService.get('ACCESS_TOKEN_EXPIRES');
+
+    const accessToken = this.jwtService.sign(payload, { secret:accessTokenSecret, expiresIn:refreshTokenExpiresIn });
+
+    return accessToken 
+     
+  }
+}

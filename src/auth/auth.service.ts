@@ -2,16 +2,18 @@ import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from 'src/user/user.repository';
 import { RegisterDto } from './dto/register.dto';
-import { EmailAlreadyExistsException } from './standard exceptions/EmailAlreadyExistsException'
-import { InvalidCredentialsException } from './standard exceptions/InvalidCredentialsException';
+import { EmailAlreadyExistsException } from './exceptions/EmailAlreadyExistsException'
+import { InvalidCredentialsException } from './exceptions/InvalidCredentialsException';
 import { LoginDto } from './dto/login.dto';
 import { generateTokens } from './generateTokens/generate-tokens';
-import { JwtService } from '@nestjs/jwt';
+
 
 @Injectable()
 export class AuthService {
   constructor(private readonly userRepository: UserRepository,
-    private readonly jwtService: JwtService
+    private readonly tokens: generateTokens,
+    
+  
   ) {}
 
   async register(body: RegisterDto) {
@@ -40,9 +42,7 @@ export class AuthService {
 
     if (!isPasswordMatch) throw new InvalidCredentialsException();
 
-    const accessToken = generateTokens(this.jwtService, user.id);
-
-    return {message: 'Login Successful', access_token: accessToken};
+    const tokens = await this.tokens.generateTokens({ sub: user.id });
   }
 
 
