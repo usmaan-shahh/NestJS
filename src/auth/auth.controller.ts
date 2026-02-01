@@ -1,9 +1,10 @@
-import { Controller, Post, Get, Body, Res } from '@nestjs/common';
+import { Controller, Post, Get, Body, Res, UseInterceptors } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { cookieOptions } from './config/cookieOptions';
 import type { Response } from 'express';
+import { CookieInterceptor } from './interceptors/cookie.interceptor';
 
 @Controller('auth')
 export class AuthController {
@@ -15,17 +16,14 @@ export class AuthController {
   }
 
   @Post('login')
-  async login(
-    @Body() body: LoginDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
-    const { access_token, refresh_token } = await this.authService.login(body);
-    res.cookie('refresh_token', refresh_token, cookieOptions);
-    return { access_token: access_token };
+  @UseInterceptors(CookieInterceptor)
+  async login(@Body() body: LoginDto) {
+    return await this.authService.login(body);
   }
 
   @Post('logout')
-  logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('refresh_token', cookieOptions);
+  @UseInterceptors(CookieInterceptor)
+  logout() {
+   return { logout: true }; 
   }
 }
