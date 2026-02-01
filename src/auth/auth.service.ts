@@ -40,17 +40,17 @@ export class AuthService {
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
 
+    console.log('after bcrypt');
+
     if (!isPasswordMatch) throw new InvalidCredentialsException();
 
     const tokens = await this.tokensService.generateTokens({ sub: user.id });
 
-    return { access_token: tokens.access_token, refresh_token: tokens.refresh_token };
+    return { access_token: tokens.accessToken, refresh_token: tokens.refreshToken };
   
   
   }
 
-
-  async logout(){}
 
 
 

@@ -29,7 +29,7 @@ export class TokensService {
 
         const refreshToken = this.jwtService.sign(payload, { secret: refreshSecret, expiresIn: refreshExpires, });
 
-         return { access_token: accessToken, refresh_token: refreshToken }   
+         return { accessToken, refreshToken}   
 
   }
 }
