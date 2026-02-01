@@ -12,7 +12,7 @@ interface JwtPayload {
 }
 
 @Injectable()
-export class AuthenticationGuard implements CanActivate {
+export class AuthGuard implements CanActivate {
   
   constructor(
     private readonly jwtService: JwtService,
@@ -20,6 +20,7 @@ export class AuthenticationGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    
     const request = context.switchToHttp().getRequest();
 
     const authHeader = request.headers.authorization;

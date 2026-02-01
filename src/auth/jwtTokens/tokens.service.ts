@@ -12,7 +12,7 @@ export class TokensService {
 
   constructor(
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+     private readonly configService: ConfigService,
   ) {}
 
   async generateTokens(payload: TokenPayload) {
