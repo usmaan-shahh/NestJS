@@ -1,6 +1,6 @@
 import {  Controller, Get, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { AuthGuard } from 'src/auth/guard/auth.guard';
+import { AuthGuard } from 'src/shared/guards/auth.guard';
 import { UserRepository } from './user.repository';
 import { CurrentUser } from './decorators/currentUser.decorator';
 
@@ -14,7 +14,7 @@ export class UserController {
   ) {}
 
   @UseGuards(AuthGuard)
-  @Get()
+  @Get('profile')
   async fetchUser(@CurrentUser() User: { userId: string }) {
     return this.userService.findById(User.userId);
   }
