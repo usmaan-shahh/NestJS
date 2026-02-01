@@ -8,14 +8,11 @@ import { CurrentUser } from './decorators/currentUser.decorator';
 @Controller('user')
 export class UserController {
 
-  constructor(
-    private readonly userService: UserService, 
-             
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   @UseGuards(AuthGuard)
-  @Get()
-  async fetchUser(@CurrentUser() User: { userId: string }) {
+  @Get('profile')
+  async profile(@CurrentUser() User: { userId: string }) {
     return this.userService.findById(User.userId);
   }
 
