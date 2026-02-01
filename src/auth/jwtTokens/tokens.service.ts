@@ -15,15 +15,21 @@ export class TokensService {
     private readonly configService: ConfigService,
   ) {}
 
-  async execute(payload: TokenPayload) {
+  async generateTokens(payload: TokenPayload) {
 
-   const secret = this.configService.get<string>('jwt.accessSecret')!;
+   const accessSecret = this.configService.get<string>('jwt.accessSecret')!;
 
-    const expiresIn = this.configService.get('jwt.accessExpires',)!;
+    const accessExpires = this.configService.get('jwt.accessExpires',)!;
 
-     const accessToken = this.jwtService.sign(payload, { secret: secret, expiresIn: expiresIn, });
+     const refreshSecret = this.configService.get<string>('jwt.refreshSecret')!;
 
-      return accessToken   
+      const refreshExpires = this.configService.get('jwt.refreshExpires')!;
+
+       const accessToken = this.jwtService.sign(payload, { secret: accessSecret, expiresIn: accessExpires, });
+
+        const refreshToken = this.jwtService.sign(payload, { secret: refreshSecret, expiresIn: refreshExpires, });
+
+         return { access_token: accessToken, refresh_token: refreshToken }   
 
   }
 }

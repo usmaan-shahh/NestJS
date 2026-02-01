@@ -16,6 +16,7 @@ export class AuthService {
   ) {}
 
   async register(body: RegisterDto) {
+    
     const { email, password } = body;
 
     const existing = await this.userRepository.findByEmail(email);
@@ -41,8 +42,26 @@ export class AuthService {
 
     if (!isPasswordMatch) throw new InvalidCredentialsException();
 
-    const tokens = await this.tokensService.execute({ sub: user.id });
+    const tokens = await this.tokensService.generateTokens({ sub: user.id });
 
-    return { access_token: tokens };
+    return { access_token: tokens.access_token, refresh_token: tokens.refresh_token };
+  
+  
   }
+
+
+  async logout(){}
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
