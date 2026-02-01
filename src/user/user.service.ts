@@ -1,19 +1,76 @@
-import { Injectable } from '@nestjs/common';
+import {  Injectable } from '@nestjs/common';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
+import { EmailAlreadyExistsException } from 'src/utils/exceptions/EmailAlreadyExistsException';
+import { InvalidPasswordException } from 'src/utils/exceptions/InvalidPasswordException';
+import * as bcrypt from 'bcrypt';
+import { SamePasswordException } from 'src/utils/exceptions/SamePasswordException';
+import { UserNotFoundException } from 'src/utils/exceptions/UserNotFoundException';
+import { NothingToUpdateException } from 'src/utils/exceptions/NothingToUpdateException';
+import { UpdateProfilePayload } from 'src/utils/interface/update-profile.interface';
+
 
 @Injectable()
 export class UserService {
-
   constructor(private readonly userRepository: UserRepository) {}
 
-  async findByEmail(email: string): Promise<User | null> {
-     return this.userRepository.findByEmail(email);
-  }
-  async findById(id: string): Promise<User | null> {
-     return this.userRepository.findById(id);
-  }
+   async fetchUser(userId: string): Promise<User | null> {
+    return this.userRepository.findById(userId);
+   }
 
-  
+    async updateProfile( id: string, payload: UpdateProfilePayload ): Promise<User | null> {
+
+    const { email, currentPassword, newPassword } = payload;
+
+    const user = await this.userRepository.findById(id);
+
+    if (!user) throw new UserNotFoundException();
+
+    const updateData: Partial<User> = {};
+
+    if (email) {
+
+    const existingUser = await this.userRepository.findByEmail(email);
+
+    if (existingUser && existingUser.id !== id) throw new EmailAlreadyExistsException();
+
+    updateData[email] = email;
+      
+    }
+
+    const wantsPasswordUpdate = currentPassword !== undefined || newPassword !== undefined; 
+
+    if (wantsPasswordUpdate) {   
+
+    if ( !currentPassword || !newPassword ) throw new InvalidPasswordException(); //Enforce both password's to be provided
+
+    const user = await this.userRepository.findByIdWithPassword(id);
+    if (!user) throw new UserNotFoundException();
+
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password); //Verify Old Password Is Correct
+    if (!isPasswordValid) throw new InvalidPasswordException();
+
+    const isSamePassword = await bcrypt.compare(newPassword, user.password); //Check if new password is same as old password
+    if (!isSamePassword) throw new SamePasswordException();
+
+    updateData.password = await bcrypt.hash(newPassword, 10);
+
+    }
+
+    if (Object.keys(updateData).length === 0) throw new NothingToUpdateException();
+
+    const updatedUser = this.userRepository.updateById(id, updateData);
+    if (!updatedUser) throw new UserNotFoundException();
+
+    return updatedUser;
+
+  }
 
 }
+
+
+
+ 
+
+
+

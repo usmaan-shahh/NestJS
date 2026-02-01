@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from 'src/user/user.repository';
 import { RegisterDto } from './dto/register.dto';
-import { EmailAlreadyExistsException } from './exceptions/EmailAlreadyExistsException'
-import { InvalidCredentialsException } from './exceptions/InvalidCredentialsException';
+import { EmailAlreadyExistsException } from '../utils/exceptions/EmailAlreadyExistsException'
+import { InvalidCredentialsException } from '../utils/exceptions/InvalidCredentialsException';
 import { LoginDto } from './dto/login.dto';
 import { TokensService } from './jwtTokens/tokens.service';
 
@@ -34,13 +34,11 @@ export class AuthService {
 
     const { email, password } = body;
 
-    const user = await this.userRepository.findByEmail(email);
+    const user = await this.userRepository.findByEmailWithPassword(email);
 
     if (!user) throw new InvalidCredentialsException();
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
-
-    console.log('after bcrypt');
 
     if (!isPasswordMatch) throw new InvalidCredentialsException();
 
@@ -50,18 +48,5 @@ export class AuthService {
   
   
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
