@@ -12,13 +12,14 @@ import { UpdateProfilePayload } from 'src/utils/interface/update-profile.interfa
 
 @Injectable()
 export class UserService {
+  
   constructor(private readonly userRepository: UserRepository) {}
 
    async fetchUser(userId: string): Promise<User | null> {
     return this.userRepository.findById(userId);
    }
 
-    async updateProfile( id: string, payload: UpdateProfilePayload ): Promise<User | null> {
+    async updateProfile( id: string, payload: UpdateProfilePayload ): Promise <User | null> {
 
     const { email, currentPassword, newPassword } = payload;
 
@@ -34,32 +35,29 @@ export class UserService {
 
     if (existingUser && existingUser.id !== id) throw new EmailAlreadyExistsException();
 
-    updateData[email] = email;
+    updateData.email = email;
       
     }
 
     const wantsPasswordUpdate = currentPassword !== undefined || newPassword !== undefined; 
 
     if (wantsPasswordUpdate) {   
-
-    if ( !currentPassword || !newPassword ) throw new InvalidPasswordException(); //Enforce both password's to be provided
-
-    const user = await this.userRepository.findByIdWithPassword(id);
-    if (!user) throw new UserNotFoundException();
-
-    const isPasswordValid = await bcrypt.compare(currentPassword, user.password); //Verify Old Password Is Correct
-    if (!isPasswordValid) throw new InvalidPasswordException();
-
-    const isSamePassword = await bcrypt.compare(newPassword, user.password); //Check if new password is same as old password
-    if (!isSamePassword) throw new SamePasswordException();
-
-    updateData.password = await bcrypt.hash(newPassword, 10);
-
+      if ( !currentPassword || !newPassword ) throw new InvalidPasswordException();
+    
+      const userWithPassword = await this.userRepository.findById(id, true);
+      if (!userWithPassword) throw new UserNotFoundException();
+    
+      const isPasswordValid = await bcrypt.compare(currentPassword, userWithPassword.password);
+      if (!isPasswordValid) throw new InvalidPasswordException();
+    
+      const isSamePassword = await bcrypt.compare(newPassword, userWithPassword.password);
+      if (isSamePassword) throw new SamePasswordException();
+    
+      updateData.password = await bcrypt.hash(newPassword, 10);
     }
-
     if (Object.keys(updateData).length === 0) throw new NothingToUpdateException();
 
-    const updatedUser = this.userRepository.updateById(id, updateData);
+    const updatedUser = await this.userRepository.updateById(id, updateData);
     if (!updatedUser) throw new UserNotFoundException();
 
     return updatedUser;

@@ -34,7 +34,7 @@ export class AuthService {
 
     const { email, password } = body;
 
-    const user = await this.userRepository.findByEmailWithPassword(email);
+    const user = await this.userRepository.findByEmail(email, true);
 
     if (!user) throw new InvalidCredentialsException();
 

@@ -10,31 +10,23 @@ export class UserRepository extends Repository<User> {
     super(User, dataSource.createEntityManager()); //Without createEntityManager(), the repository cannot talk to the database.
   }
 
-  async findByEmailWithPassword(email: string): Promise<User | null> {
-
+  async findByEmail(email: string, withPassword = false): Promise<User | null> {
     return this.findOne({
       where: { email },
-      select: { email: true, password: true},
-    });
-    
-  }
-
-  async findByEmail(email: string): Promise<User | null> {
-    return this.findOne({
-      where: { email },
+      select: withPassword ? { id: true, email: true, password: true } : { id: true, email: true },
     });
   }
 
-  async findById(id: string): Promise<User | null> {
-    return this.findOne({
-      where: { id },
-    });
-  }
-
-  async findByIdWithPassword(id: string): Promise<User | null> {
+  async findById(id: string, withPassword = false): Promise<User | null> {
+    if (withPassword) {
+      return this.createQueryBuilder('user')
+        .addSelect('user.password')
+        .where('user.id = :id', { id })
+        .getOne();
+    }
     return this.findOne({
       where: { id },
-      select: { password: true },
+      select: { id: true, email: true },
     });
   }
 
