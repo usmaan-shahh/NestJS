@@ -15,6 +15,13 @@ export class UserRepository extends Repository<User> { //Our Custom Repository i
       });
   }
 
+  async findById(id: string): Promise<User | null> {
+      return this.findOne({
+        where: { id },
+      });
+  }
+
+
   async createUser(data: Partial<User>): Promise<User> {
       const user = this.create(data);
       return this.save(user);

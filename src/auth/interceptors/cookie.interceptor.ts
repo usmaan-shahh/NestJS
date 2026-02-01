@@ -10,15 +10,15 @@ export class CookieInterceptor implements NestInterceptor {
 
     const response = context.switchToHttp().getResponse();
 
-    return next.handle().pipe( tap((data) => {
-        
-      //Set Refresh Token as HTTP Only Cookie
+     return next.handle().pipe( tap((data) => { //data is whatever the controller returns.
+
+      //Set Refresh Token as HTTP Only Cookie In Login Request
       if (data?.refresh_token) response.cookie('refresh_token', data.refresh_token, cookieOptions);
 
       delete data.refresh_token;
 
-      //Clear Cookie on Logout
-      if (data?.logout) response.clearCookie('refresh_token');
+       //Clear Cookie on Logout Request
+       if (data?.logout) response.clearCookie('refresh_token');
       
     }))
 

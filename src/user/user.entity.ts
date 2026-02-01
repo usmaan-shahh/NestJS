@@ -1,15 +1,14 @@
 import {Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn} from 'typeorm';
 
-@Entity('users')// Adds Extra Info to the User Class to be used as a DB Entity and name it as 'users' table
+@Entity('users') // Adds Extra Info to the User Class to be used as a DB Entity and name it as 'users' table
 export class User {
-
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ unique: true })
   email: string;
 
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @CreateDateColumn()
@@ -17,5 +16,4 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
-
 }
