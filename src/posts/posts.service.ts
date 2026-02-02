@@ -6,7 +6,7 @@ export class PostsService {
    constructor(private postsRepository: PostsRepository) {}
 
 
-    async createPost(data: Partial<{ userId: string }>) {   
+    async createPost(data: Partial<{ userId: string; title: string; content: string }>) {   
         return this.postsRepository.createPost(data);
     }
 

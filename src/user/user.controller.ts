@@ -1,6 +1,6 @@
 import {  Body, Controller, Delete, Get, Patch, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { AuthGuard } from '../shared-modules/auth-guard/auth.guard';
+import { AuthGuard } from '../shared/shared-modules/auth-guard/auth.guard';
 import { CurrentUser } from '../shared/shared-decorators/currentUser.decorator';
 import { UpdateProfileDto } from './dto/updateProfile.dto';
 import { UpdateProfileResult } from 'src/utils/interface/update-profile.interface';
