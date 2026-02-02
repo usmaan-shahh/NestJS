@@ -10,10 +10,4 @@ export class User {
 
   @Column()
   password: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 }

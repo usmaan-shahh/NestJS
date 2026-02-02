@@ -10,16 +10,6 @@ import {
 import { validateEmailForUpdate } from './validators/validate-email';
 import { validatePasswordForUpdate } from './validators/validate-password';
 
-function buildUpdateSuccessMessage(updated: {
-  email?: boolean;
-  password?: boolean;
-}): string {
-  const parts: string[] = [];
-  if (updated.email) parts.push('Email successfully updated');
-  if (updated.password) parts.push('Password successfully changed');
-  return parts.join('. ');
-}
-
 @Injectable()
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
@@ -59,7 +49,15 @@ export class UserService {
     const savedUser = await this.userRepository.updateById(id, updateData);
     if (!savedUser) throw new UserNotFoundException();
 
-    const message = buildUpdateSuccessMessage(updated);
+    let message = 'Profile Updated Successfully.';
+    if (updated.email && updated.password) {
+      message = 'Email and password updated successfully.';
+    } else if (updated.email) {
+      message = 'Email updated successfully.';
+    } else if (updated.password) {
+      message = 'Password updated successfully.';
+    }
+
     return { message };
   }
 

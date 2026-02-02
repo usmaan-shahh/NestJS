@@ -4,7 +4,6 @@ export interface UpdateProfilePayload {
   newPassword?: string;
 }
 
-/** Shape returned by updateProfile: success message describing what was updated. */
 export interface UpdateProfileResult {
   message: string;
 }
