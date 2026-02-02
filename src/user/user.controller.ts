@@ -1,28 +1,30 @@
-import {  Body, Controller, Delete, Get, Patch, UseGuards } from '@nestjs/common';
+import {  Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { AuthGuard } from '../shared/shared-modules/auth-guard/auth.guard';
 import { CurrentUser } from '../shared/shared-decorators/currentUser.decorator';
 import { UpdateProfileDto } from './dto/updateProfile.dto';
 import { UpdateProfileResult } from './interface/update-profile.interface';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-
-
-@Controller('user')
+@ApiTags('User')
+@Controller('/api/v1/user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  
+  @ApiOperation({summary: 'This endpoint is used to get details of the user'})
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  @Get('profile')
+  @Get('me')
   async fetchUser(@CurrentUser() User: { userId: string }) {
     return this.userService.fetchUser(User.userId);
   }
 
+  @ApiOperation({
+    summary: 'This endpoint is used to update email and password of the user',
+  })
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  @Patch('update')
+  @Put('me')
   async updateUser(
     @CurrentUser() user: { userId: string },
     @Body() body: UpdateProfileDto,
