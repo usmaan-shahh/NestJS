@@ -1,74 +1,66 @@
-import {  Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
-import { EmailAlreadyExistsException } from 'src/utils/exceptions/EmailAlreadyExistsException';
-import { InvalidPasswordException } from 'src/utils/exceptions/InvalidPasswordException';
-import * as bcrypt from 'bcrypt';
-import { SamePasswordException } from 'src/utils/exceptions/SamePasswordException';
 import { UserNotFoundException } from 'src/utils/exceptions/UserNotFoundException';
 import { NothingToUpdateException } from 'src/utils/exceptions/NothingToUpdateException';
-import { UpdateProfilePayload } from 'src/utils/interface/update-profile.interface';
+import {
+  UpdateProfilePayload,
+  UpdateProfileResult,
+} from 'src/utils/interface/update-profile.interface';
+import { validateEmailForUpdate } from './validators/validate-email';
+import { validatePasswordForUpdate } from './validators/validate-password';
 
+function buildUpdateSuccessMessage(updated: {
+  email?: boolean;
+  password?: boolean;
+}): string {
+  const parts: string[] = [];
+  if (updated.email) parts.push('Email successfully updated');
+  if (updated.password) parts.push('Password successfully changed');
+  return parts.join('. ');
+}
 
 @Injectable()
 export class UserService {
-  
   constructor(private readonly userRepository: UserRepository) {}
 
-   async fetchUser(userId: string): Promise<User | null> {
+  async fetchUser(userId: string): Promise<User | null> {
     return this.userRepository.findById(userId);
-   }
+  }
 
-    async updateProfile( id: string, payload: UpdateProfilePayload ): Promise <User | null> {
-
+  async updateProfile(id: string, payload: UpdateProfilePayload):Promise <UpdateProfileResult>{
+    
     const { email, currentPassword, newPassword } = payload;
 
-    const user = await this.userRepository.findById(id);
+    const isUpdatingPassword = currentPassword !== undefined || newPassword !== undefined;
 
+    const user = await this.userRepository.findById(id, isUpdatingPassword);
     if (!user) throw new UserNotFoundException();
 
     const updateData: Partial<User> = {};
+    const updated: { email?: boolean; password?: boolean } = {};
 
     if (email) {
-
-    const existingUser = await this.userRepository.findByEmail(email);
-
-    if (existingUser && existingUser.id !== id) throw new EmailAlreadyExistsException();
-
-    updateData.email = email;
-      
+      await validateEmailForUpdate(this.userRepository, id, email);
+      updateData.email = email; updated.email = true;
     }
 
-    const wantsPasswordUpdate = currentPassword !== undefined || newPassword !== undefined; 
-
-    if (wantsPasswordUpdate) {   
-      if ( !currentPassword || !newPassword ) throw new InvalidPasswordException();
-    
-      const userWithPassword = await this.userRepository.findById(id, true);
-      if (!userWithPassword) throw new UserNotFoundException();
-    
-      const isPasswordValid = await bcrypt.compare(currentPassword, userWithPassword.password);
-      if (!isPasswordValid) throw new InvalidPasswordException();
-    
-      const isSamePassword = await bcrypt.compare(newPassword, userWithPassword.password);
-      if (isSamePassword) throw new SamePasswordException();
-    
-      updateData.password = await bcrypt.hash(newPassword, 10);
+    if (isUpdatingPassword) {
+      updateData.password = await validatePasswordForUpdate(
+        user as User & { password: string },
+        currentPassword,
+        newPassword,
+      );
+      updated.password = true;
     }
+
     if (Object.keys(updateData).length === 0) throw new NothingToUpdateException();
 
-    const updatedUser = await this.userRepository.updateById(id, updateData);
-    if (!updatedUser) throw new UserNotFoundException();
+    const savedUser = await this.userRepository.updateById(id, updateData);
+    if (!savedUser) throw new UserNotFoundException();
 
-    return updatedUser;
-
+    const message = buildUpdateSuccessMessage(updated);
+    return { message };
   }
 
 }
-
-
-
- 
-
-
-

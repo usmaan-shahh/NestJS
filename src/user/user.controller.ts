@@ -3,7 +3,8 @@ import { UserService } from './user.service';
 import { AuthGuard } from '../shared-modules/auth-guard/auth.guard';
 import { CurrentUser } from './decorators/currentUser.decorator';
 import { UpdateProfileDto } from './dto/updateProfile.dto';
-import { User } from './user.entity';
+import { UpdateProfileResult } from 'src/utils/interface/update-profile.interface';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 
 
@@ -11,17 +12,21 @@ import { User } from './user.entity';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Get('profile')
   async fetchUser(@CurrentUser() User: { userId: string }) {
     return this.userService.fetchUser(User.userId);
   }
 
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Patch('update')
-  async updateUser(@CurrentUser() user: { userId: string }, @Body() body: UpdateProfileDto
-  ): Promise<User | null> {
-    return await this.userService.updateProfile(user.userId, body);
+  async updateUser(
+    @CurrentUser() user: { userId: string },
+    @Body() body: UpdateProfileDto,
+  ): Promise<UpdateProfileResult> {
+    return this.userService.updateProfile(user.userId, body);
   }
-
 }

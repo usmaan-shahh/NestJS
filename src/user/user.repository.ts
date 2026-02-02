@@ -18,12 +18,14 @@ export class UserRepository extends Repository<User> {
   }
 
   async findById(id: string, withPassword = false): Promise<User | null> {
+
     if (withPassword) {
       return this.createQueryBuilder('user')
         .addSelect('user.password')
         .where('user.id = :id', { id })
         .getOne();
     }
+    
     return this.findOne({
       where: { id },
       select: { id: true, email: true },
