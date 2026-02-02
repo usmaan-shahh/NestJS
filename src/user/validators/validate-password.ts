@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcrypt';
 import { User } from '../user.entity';
-import { InvalidPasswordException } from 'src/utils/exceptions/InvalidPasswordException';
-import { SamePasswordException } from 'src/utils/exceptions/SamePasswordException';
+import { InvalidPasswordException } from 'src/shared/shared-exceptions/InvalidPasswordException';
+import { SamePasswordException } from 'src/shared/shared-exceptions/SamePasswordException';
 
 export async function validatePasswordForUpdate(
   user: User & { password: string },

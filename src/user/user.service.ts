@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
-import { UserNotFoundException } from 'src/utils/exceptions/UserNotFoundException';
-import { NothingToUpdateException } from 'src/utils/exceptions/NothingToUpdateException';
+import { UserNotFoundException } from 'src/shared/shared-exceptions/UserNotFoundException';
+import { NothingToUpdateException } from 'src/shared/shared-exceptions/NothingToUpdateException';
 import {
   UpdateProfilePayload,
   UpdateProfileResult,

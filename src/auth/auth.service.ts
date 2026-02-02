@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from 'src/user/user.repository';
 import { RegisterDto } from './dto/register.dto';
-import { EmailAlreadyExistsException } from '../utils/exceptions/EmailAlreadyExistsException'
-import { InvalidCredentialsException } from '../utils/exceptions/InvalidCredentialsException';
+import { EmailAlreadyExistsException } from '../shared/shared-exceptions/EmailAlreadyExistsException';
+import { InvalidCredentialsException } from '../shared/shared-exceptions/InvalidCredentialsException';
 import { LoginDto } from './dto/login.dto';
 import { TokensService } from './jwtTokens/tokens.service';
 

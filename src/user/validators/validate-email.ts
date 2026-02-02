@@ -1,5 +1,5 @@
 import { UserRepository } from '../user.repository';
-import { EmailAlreadyExistsException } from 'src/utils/exceptions/EmailAlreadyExistsException';
+import { EmailAlreadyExistsException } from 'src/shared/shared-exceptions/EmailAlreadyExistsException';
 
 export async function validateEmailForUpdate(
   userRepository: UserRepository,
