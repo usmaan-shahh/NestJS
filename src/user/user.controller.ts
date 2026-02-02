@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { AuthGuard } from '../shared/shared-modules/auth-guard/auth.guard';
 import { CurrentUser } from '../shared/shared-decorators/currentUser.decorator';
 import { UpdateProfileDto } from './dto/updateProfile.dto';
-import { UpdateProfileResult } from 'src/utils/interface/update-profile.interface';
+import { UpdateProfileResult } from './interface/update-profile.interface';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 

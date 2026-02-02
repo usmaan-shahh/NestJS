@@ -6,7 +6,7 @@ import { NothingToUpdateException } from 'src/utils/exceptions/NothingToUpdateEx
 import {
   UpdateProfilePayload,
   UpdateProfileResult,
-} from 'src/utils/interface/update-profile.interface';
+} from './interface/update-profile.interface';
 import { validateEmailForUpdate } from './validators/validate-email';
 import { validatePasswordForUpdate } from './validators/validate-password';
 

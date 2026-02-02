@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from 'src/user/user.repository';
-import { BCRYPT_ROUNDS } from 'src/utils/constants';
 import { RegisterDto } from './dto/register.dto';
 import { EmailAlreadyExistsException } from '../utils/exceptions/EmailAlreadyExistsException'
 import { InvalidCredentialsException } from '../utils/exceptions/InvalidCredentialsException';
@@ -24,7 +23,7 @@ export class AuthService {
 
     if (existing) throw new EmailAlreadyExistsException();
 
-    const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     await this.userRepository.createUser({ email, password: hashedPassword });
 
