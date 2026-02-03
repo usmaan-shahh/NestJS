@@ -43,6 +43,6 @@ export class RegisterResponseDto {
 
   body instanceof RegisterDto  // true
 
-  A DTO(Data Transfer Object) class defines the structure, types and validation rules of incoming data and ValidationPipe enforces them before the controller runs 
+  A DTO(Data Transfer Object) class defines the structure, and validation rules of incoming data and ValidationPipe enforces them before the controller runs 
   
 */

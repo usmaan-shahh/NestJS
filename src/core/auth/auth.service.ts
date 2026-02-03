@@ -31,7 +31,8 @@ export class AuthService {
     if (!user) throw new InvalidCredentialsException();
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) throw new InvalidCredentialsException();
-    const tokens = await this.tokensService.GenerateTokens({ sub: user.id });  
+    const tokens = await this.tokensService.GenerateTokens({ sub: user.id });
+    //at this point user is an object of type user entity 
     return plainToInstance(
       LoginResponseDto, 
       {
