@@ -1,25 +1,33 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import cookieParser from 'cookie-parser';
-import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import {SwaggerModule } from '@nestjs/swagger';
+import { swaggerConfig } from './core/config/swagger.config';
 
 async function bootstrap() {
-
+  
   const app = await NestFactory.create(AppModule);
-  const config = new DocumentBuilder()
-    .setTitle('My API')
-    .setDescription('API documentation')
-    .setVersion('0.1')
-    .addBearerAuth()
-    .build();
-   const document = SwaggerModule.createDocument(app, config);
-   SwaggerModule.setup('docs', app, document);
 
-   app.useGlobalPipes(new ValidationPipe( {whitelist: true, forbidNonWhitelisted: true, transform: true} ));
-   app.use(cookieParser());
-   await app.listen(process.env.PORT ?? 3000);
+  //SWAGGER
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('docs', app, document);
 
+  //ValidationPipe
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }));
+
+  //Cookie-Parser
+  app.use(cookieParser());
+
+
+  app.useGlobalInterceptors(
+    new ClassSerializerInterceptor(app.get(Reflector), {
+      excludeExtraneousValues: true,
+    }),
+  );
+
+
+  await app.listen(process.env.PORT ?? 3000);
 }
 
 bootstrap();
